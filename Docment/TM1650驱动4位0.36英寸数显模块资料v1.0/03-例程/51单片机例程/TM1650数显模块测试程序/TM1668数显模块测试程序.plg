@@ -1,0 +1,17 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Project:</h2>
+F:\01-核心结构\04-信息架构\02-产品信息\03-单体模块\04-数显显示\NO.2012710-Serial TM1650 8-seg-0.36-4 Display Board（Normal）\01-资料整理\03-例程\51单片机例程\TM1650数显模块测试程序\TM1650数显模块测试程序.uvproj
+Project File Date:  03/14/2017
+
+<h2>Output:</h2>
+Build target 'STC89C52'
+assembling STARTUP.A51...
+compiling Main.c...
+compiling tm1650.c...
+linking...
+Program Size: data=24.3 xdata=0 code=912
+creating hex file from "TM1650数显模块测试程序"...
+"TM1650数显模块测试程序" - 0 Error(s), 0 Warning(s).

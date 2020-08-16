@@ -1,0 +1,167 @@
+C51 COMPILER V7.02a   MAIN                                                                 07/31/2019 10:25:36 PAGE 1   
+
+
+C51 COMPILER V7.02a, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN MAIN.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE MAIN.C BROWSE DEBUG OBJECTEXTEND
+
+stmt level    source
+
+   1          /*------------------------------------------------------------------------------------
+   2           * 项目名称:
+   3          
+   4               TM1650数显模块测试程序
+   5          
+   6          
+   7           * 历史版本:
+   8                   
+   9               2016-5-11:
+  10                 - 初始版本 V1.0.0;
+  11          
+  12           * 配置说明:
+  13          
+  14               - 编译前，请根据硬件连接配置MCU与模块的通讯接口
+  15          -------------------------------------------------------------------------------------*/
+  16          /************************包含头文件***************************************************/
+  17          
+  18          #include<reg52.h>
+  19          #include<TM1650.h>
+  20          
+  21          /****************执行芯片初始化函数时是以此处所定义参数来设置芯片*********************/
+  22          #define ON      DISPLAY_ON
+  23          #define OFF     DISPLAY_OFF
+  24          unsigned char  LightLevel =     LV1;                               //显示亮度设置，设置取值范围见【芯片参数定义】                               
+  25          unsigned char  WorkMode  =      NORMAL_MODE;               //工作模式定义，取值范围见【芯片参数定义】
+  26          //显示段模式设置，有两种：8段显示模式和7段显示模式（取值范围见【芯片参数定义】）
+  27          #define SegmentMode             _8_SEGMENT_MODE 
+  28          
+  29          /*******************************全局变量**********************************************/
+  30          //八段数码管显示的每一段
+  31          unsigned char code Seg_test[8]=      {0x20,0x01,0x02,0x04,0x08,0x10,0x40,0x80}; 
+  32          //共阳极数码管数字0-9编码数组                           
+  33          unsigned char code Number_arr[10]=   {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};       
+  34          
+  35          /*************************************************************************************
+  36          *函数名：Delay(unsigned char time)
+  37          *功  能：延时函数
+  38          **************************************************************************************/
+  39          void Delay(unsigned char time)
+  40          {
+  41   1              int i,j,k;
+  42   1              for(i=0;i<time;i++)
+  43   1                      for(j=0;j<50;j++)
+  44   1                              for(k=0;k<90;k++)
+  45   1                              {
+  46   2                                      ;
+  47   2                              }
+  48   1      }
+  49          
+  50          /************************主程序*******************************************************/
+  51          void main()
+  52          {
+  53   1              unsigned char key_value=0;
+  54   1              unsigned char show_buff[4];
+  55   1              unsigned char i,j=0,k=0,l=0,m=0;
+C51 COMPILER V7.02a   MAIN                                                                 07/31/2019 10:25:36 PAGE 2   
+
+  56   1              unsigned char temp[4]={0x3f,0x06,0x5b,0x4f};
+  57   1              bit err = 0;
+  58   1              Delay(10);
+  59   1      
+  60   1              P0 = 0;
+  61   1              Delay(10);
+  62   1              P0 = 0xFF;
+  63   1              P1 = 0;
+  64   1              //配置显示模块参数
+  65   1              err = DisplayConfig_TM1650(LightLevel,SegmentMode,WorkMode,ON);
+  66   1              //上电后让所有位所有段全亮
+  67   1              for(i = 0;i < 4; i++)
+  68   1              {
+  69   2                      err = DisplayOneDigi_TM1650(i+1,0xff);
+  70   2              }
+  71   1              Delay(10);
+  72   1              for(i = 0;i < 4; i++)
+  73   1              {
+  74   2                      err = DisplayOneDigi_TM1650(i+1,0);
+  75   2              }
+  76   1              Delay(10);
+  77   1              while(1)
+  78   1              {
+  79   2                      key_value = Scan_Key_TM1650(LightLevel,SegmentMode,WorkMode); //获取按键值
+  80   2      
+  81   2                      //通过以下把键值显示出来，得出键值为：0x89=137 0x9b=155 0xad=173 0xbf=191 此处和数据手册的值不同，可以忽
+             -略。有稳定值即可
+  82   2      /*
+  83   2                      show_buff[0]=0;
+  84   2                      show_buff[1]=key_value/100;
+  85   2                      show_buff[2]=key_value/10%10;
+  86   2                      show_buff[3]=key_value%10;
+  87   2      */
+  88   2      
+  89   2                      //转换键值为01234
+  90   2                      if(key_value==137){show_buff[3]=1;}
+  91   2                      else if(key_value==155){show_buff[3]=2;}
+  92   2                      else if(key_value==173){show_buff[3]=3;}
+  93   2                      else if(key_value==191){show_buff[3]=4;}
+  94   2                      else{show_buff[3]=0;}
+  95   2      
+  96   2                      //显示键值
+  97   2                      for(i = 0;i < 4; i++)
+  98   2                      {
+  99   3                              err = DisplayOneDigi_TM1650(i+1,Number_arr[show_buff[i]]);
+ 100   3                      }
+ 101   2      
+ 102   2                      /*              
+ 103   2                      //让4位数码管的每个段分别点亮
+ 104   2                      for(m=0;m<=9;m++)
+ 105   2                      {
+ 106   2                              for(i=0;i<4;i++)
+ 107   2                              {
+ 108   2                                       err = DisplayOneDigi_TM1650(i+1,Seg_test[m]);
+ 109   2                              }
+ 110   2                              Delay(10);
+ 111   2                      }
+ 112   2      
+ 113   2                      //数码管显示测试,控制每个数码管显示从0-9
+ 114   2                      for(m=0;m<=9;m++)
+ 115   2                      {
+ 116   2                              for(i=0;i<4;i++)
+C51 COMPILER V7.02a   MAIN                                                                 07/31/2019 10:25:36 PAGE 3   
+
+ 117   2                              {
+ 118   2                                      err = DisplayOneDigi_TM1650(i+1,Number_arr[m]);
+ 119   2                              }
+ 120   2                              Delay(10);                      
+ 121   2                      }
+ 122   2                      //显示temp数组中的内容
+ 123   2                      for(i=0;i<4;i++)
+ 124   2                      {
+ 125   2                              err = DisplayOneDigi_TM1650(i+1,temp[i]);
+ 126   2                      }
+ 127   2                      Delay(10);      
+ 128   2      
+ 129   2                      //关显示
+ 130   2                      err = DisplayOFF_TM1650(LightLevel,SegmentMode,WorkMode);                       
+ 131   2                      Delay(10);      
+ 132   2                      
+ 133   2                      //开显示
+ 134   2                      err = DisplayON_TM1650(LightLevel,SegmentMode,WorkMode);                        
+ 135   2                      Delay(10);      
+ 136   2                      */
+ 137   2                              
+ 138   2              }
+ 139   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    259    ----
+   CONSTANT SIZE    =     22    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2      14
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

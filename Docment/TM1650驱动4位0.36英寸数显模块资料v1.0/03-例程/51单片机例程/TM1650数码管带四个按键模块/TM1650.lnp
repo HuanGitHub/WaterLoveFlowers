@@ -1,0 +1,4 @@
+"TM1650.obj",
+"MAIN.obj" 
+TO "TM1650" 
+RAMSIZE(256) 

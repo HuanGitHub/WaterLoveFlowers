@@ -1,0 +1,326 @@
+C51 COMPILER V7.02a   TM1650                                                               07/31/2019 10:20:37 PAGE 1   
+
+
+C51 COMPILER V7.02a, COMPILATION OF MODULE TM1650
+OBJECT MODULE PLACED IN TM1650.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE TM1650.C BROWSE DEBUG OBJECTEXTEND
+
+stmt level    source
+
+   1          /*------------------------------------------------------------------------------------
+   2           * 项目名称:
+   3          
+   4               TM1650芯片驱动程序v1.0
+   5          
+   6           * 历史版本:
+   7               2016-12-07:
+   8                 - 初始版本 V1.0.0;
+   9          
+  10           * 备注:
+  11               - 使用前需要在TM1668.h文件设置通信接口、初始化数据
+  12          -------------------------------------------------------------------------------------*/
+  13          
+  14          /************************包含头文件***************************************************/
+  15          
+  16          #include <reg52.h>
+  17          #include "TM1650.h"
+  18          
+  19          unsigned char tmp,err;
+  20          code unsigned char DisplayAddressArray[4] = {DIG1_ADDRESS,DIG2_ADDRESS,DIG3_ADDRESS,DIG4_ADDRESS};
+  21          
+  22          /*************************************************************************************
+  23          *函数名：void FrameStart_1650(void)
+  24          *功  能：帧起始信号
+  25          *说  明：保持SCK为高，DIO从1跳到0为起始信号
+  26          **************************************************************************************/
+  27          void FrameStart_1650(void)
+  28          {
+  29   1              //先全部拉高
+  30   1              DIO=1;
+  31   1              SCK=1;            
+  32   1              //DIO拉低,然后将SCK也拉低，为后续传输准备
+  33   1              DIO=0;
+  34   1      }
+  35          
+  36          /*************************************************************************************
+  37          *函数名：void FrameStop_1650(void)
+  38          *功  能：帧结束信号
+  39          *说  明：保持SCK为高，DIO从0跳到1为结束信号
+  40          **************************************************************************************/
+  41          void FrameEnd_1650(void)
+  42          {
+  43   1              //先全部拉高
+  44   1              DIO=0;
+  45   1              SCK=1;            
+  46   1              //DIO拉低,然后将SCK也拉低，为后续传输准备
+  47   1              DIO=1;
+  48   1      }
+  49          /*************************************************************************************
+  50          *函数名：bit FrameAck_1650(void)
+  51          *功  能：帧Ack信号
+  52          *说  明：返回值为0表示通信正常，返回值为1表示通信异常
+  53          **************************************************************************************/
+  54          bit FrameAck_1650(void)
+  55          {
+C51 COMPILER V7.02a   TM1650                                                               07/31/2019 10:20:37 PAGE 2   
+
+  56   1              //先判断DIO
+  57   1              if(DIO==0)
+  58   1              {
+  59   2                      SCK=1;
+  60   2                      SCK=0;
+  61   2                      return 0;
+  62   2              }
+  63   1              else
+  64   1              {
+  65   2                      return 1;
+  66   2              }
+  67   1      }
+  68          /*************************************************************************************
+  69          *函数名：SendOne_TM1650(unsigned char firstByte)
+  70          *功  能：发送一个字节的数据
+  71          *说  明：低位先发送
+  72          **************************************************************************************/
+  73          bit SendOne_TM1650(unsigned char firstByte)
+  74          {
+  75   1              unsigned char tmp;
+  76   1              unsigned char i=0;
+  77   1              bit err=0;                      //出错时返回1
+  78   1      
+  79   1              tmp=firstByte;
+  80   1              //起始信号
+  81   1              FrameStart_1650();
+  82   1              //发送数据，先发firstByte，再发secondByte，MSB在前
+  83   1              for(i=0;i<8;i++)
+  84   1              {
+  85   2                      if(tmp&0x80)
+  86   2                      {
+  87   3                              DIO=1;
+  88   3                      }
+  89   2                      else
+  90   2                      {
+  91   3                              DIO=0;
+  92   3                      }
+  93   2              
+  94   2                      SCK=0;
+  95   2                      SCK=1;
+  96   2                      SCK=0;
+  97   2                      
+  98   2                      tmp=tmp<<1;
+  99   2              }
+ 100   1              //判断ACK
+ 101   1              if(FrameAck_1650()==1)
+ 102   1              {
+ 103   2                      err=1;
+ 104   2              }
+ 105   1              //发送secondByte
+ 106   1              return err;
+ 107   1      }
+ 108          /*************************************************************************************
+ 109          *函数名：SendOneCouple_TM1650(unsigned char firstByte,unsigned char secondByte)
+ 110          *功  能：1668发送一个字节的数据
+ 111          *说  明：低位先发送
+ 112          **************************************************************************************/
+ 113          bit SendOneCouple_TM1650(unsigned char firstByte,unsigned char secondByte)
+ 114          {
+ 115   1              unsigned char tmp;
+ 116   1              unsigned char i=0;
+ 117   1              bit err=0;                      //出错时返回1
+C51 COMPILER V7.02a   TM1650                                                               07/31/2019 10:20:37 PAGE 3   
+
+ 118   1      
+ 119   1              tmp=firstByte;
+ 120   1              //起始信号
+ 121   1              FrameStart_1650();
+ 122   1              //发送数据，先发firstByte，再发secondByte，MSB在前
+ 123   1              for(i=0;i<8;i++)
+ 124   1              {
+ 125   2                      if(tmp&0x80)
+ 126   2                      {
+ 127   3                              DIO=1;
+ 128   3                      }
+ 129   2                      else
+ 130   2                      {
+ 131   3                              DIO=0;
+ 132   3                      }
+ 133   2              
+ 134   2                      SCK=0;
+ 135   2                      SCK=1;
+ 136   2                      SCK=0;
+ 137   2                      
+ 138   2                      tmp=tmp<<1;
+ 139   2              }
+ 140   1              //判断ACK
+ 141   1              if(FrameAck_1650()==1)
+ 142   1              {
+ 143   2                      err=1;
+ 144   2              }
+ 145   1              //发送secondByte
+ 146   1              tmp=secondByte;
+ 147   1              for(i=0;i<8;i++)
+ 148   1              {
+ 149   2                      if(tmp&0x80)
+ 150   2                      {
+ 151   3                              DIO=1;
+ 152   3                      }
+ 153   2                      else
+ 154   2                      {
+ 155   3                              DIO=0;
+ 156   3                      }
+ 157   2              
+ 158   2                      SCK=0;
+ 159   2                      SCK=1;
+ 160   2                      SCK=0;
+ 161   2                      
+ 162   2                      tmp=tmp<<1;
+ 163   2              }
+ 164   1              //判断ACK
+ 165   1              if(FrameAck_1650()==1)
+ 166   1              {
+ 167   2                      err=1;
+ 168   2              }
+ 169   1              //结束信号
+ 170   1              FrameEnd_1650();
+ 171   1              //返回值
+ 172   1              return err;
+ 173   1      }
+ 174          /*************************************************************************************
+ 175          *函数名：bit DisplayConfig_TM1650(unsigned char lightLevel,unsigned char SegmentMode,unsigned char WorkMod
+             -e)
+ 176          *功  能：1668发送一个命令
+ 177          *说  明：低位先发送
+ 178          **************************************************************************************/
+C51 COMPILER V7.02a   TM1650                                                               07/31/2019 10:20:37 PAGE 4   
+
+ 179          bit DisplayConfig_TM1650(unsigned char lightLevel,unsigned char SegmentMode,unsigned char WorkMode,unsigne
+             -d char on_or_off)
+ 180          {
+ 181   1              unsigned char tmp = 0;
+ 182   1              bit err = 0;
+ 183   1              tmp = lightLevel | SegmentMode |  WorkMode | on_or_off;
+ 184   1              err = SendOneCouple_TM1650(CMD_SYSTEM_CONFIG,tmp);
+ 185   1      
+ 186   1              if(err == 1)
+ 187   1              {
+ 188   2                      return 1;
+ 189   2              }
+ 190   1              else
+ 191   1              {
+ 192   2                      return 0;
+ 193   2              }
+ 194   1      
+ 195   1      }
+ 196          /*************************************************************************************
+ 197          *函数名：bit DisplayOneDigi_TM1650(unsigned char digi,unsigned char cha)
+ 198          *功  能：
+ 199          *说  明：
+ 200          *参  数：
+ 201          **************************************************************************************/
+ 202          bit DisplayOneDigi_TM1650(unsigned char digi,unsigned char cha)
+ 203          {
+ 204   1              unsigned char tmp = 0;
+ 205   1              bit err = 0;
+ 206   1              err = SendOneCouple_TM1650(DisplayAddressArray[digi-1],cha);
+ 207   1              return err;
+ 208   1      }
+ 209          
+ 210          /*************************************************************************************
+ 211          *函数名：bit DisplayOFF_TM1650(unsigned char lightLevel,unsigned char SegmentMode,unsigned char WorkMode)
+ 212          *功  能：
+ 213          *说  明：
+ 214          *参  数：
+ 215          **************************************************************************************/
+ 216          bit DisplayOFF_TM1650(unsigned char lightLevel,unsigned char SegmentMode,unsigned char WorkMode)
+ 217          {
+ 218   1              unsigned char tmp = 0;
+ 219   1              bit err = 0;
+ 220   1              tmp = lightLevel | SegmentMode |  WorkMode | DISPLAY_OFF;
+ 221   1              err = SendOneCouple_TM1650(CMD_SYSTEM_CONFIG,tmp);
+ 222   1      
+ 223   1              if(err == 1)
+ 224   1              {
+ 225   2                      return 1;
+ 226   2              }
+ 227   1              else
+ 228   1              {
+ 229   2                      return 0;
+ 230   2              }
+ 231   1      }
+ 232          /*************************************************************************************
+ 233          *函数名：DisplayON_TM1650(unsigned char lightLevel,unsigned char SegmentMode,unsigned char WorkMode)
+ 234          *功  能：固定地址模式在指定位显示一个数据
+ 235          *说  明：
+ 236          *参  数：digi-显示的位，从1-4（从左到右），cha-待显示数据
+ 237          **************************************************************************************/
+ 238          bit DisplayON_TM1650(unsigned char lightLevel,unsigned char SegmentMode,unsigned char WorkMode)
+ 239          {
+C51 COMPILER V7.02a   TM1650                                                               07/31/2019 10:20:37 PAGE 5   
+
+ 240   1              unsigned char tmp = 0;
+ 241   1              bit err = 0;
+ 242   1              tmp = lightLevel | SegmentMode |  WorkMode | DISPLAY_ON;
+ 243   1              err = SendOneCouple_TM1650(CMD_SYSTEM_CONFIG,tmp);
+ 244   1      
+ 245   1              if(err == 1)
+ 246   1              {
+ 247   2                      return 1;
+ 248   2              }
+ 249   1              else
+ 250   1              {
+ 251   2                      return 0;
+ 252   2              }
+ 253   1      }
+ 254          
+ 255          /*************************************************************************************
+ 256          *函数名：unsigned char Scan_Key_TM1650(void)
+ 257          *功  能：从TM1650获取按键值
+ 258          *说  明：
+ 259          *参  数：返回键值
+ 260          **************************************************************************************/
+ 261          unsigned char Scan_Key_TM1650(unsigned char lightLevel,unsigned char SegmentMode,unsigned char WorkMode)  
+             -        // 按键扫描
+ 262          {
+ 263   1              unsigned char i;
+ 264   1              unsigned char rekey;
+ 265   1              FrameStart_1650();
+ 266   1                      err = SendOne_TM1650(CMD_READ_KEYPAD);
+ 267   1              FrameAck_1650();
+ 268   1             // DIO=1;
+ 269   1              for(i=0;i<8;i++)
+ 270   1              {
+ 271   2                 SCK=1;
+ 272   2                 rekey = rekey<<1;
+ 273   2                 if(DIO)
+ 274   2                 {
+ 275   3                         rekey++;
+ 276   3                 } 
+ 277   2                 SCK=0;        
+ 278   2              }
+ 279   1              FrameAck_1650();
+ 280   1              FrameEnd_1650();
+ 281   1              return(rekey);
+ 282   1      }
+*** WARNING C280 IN LINE 261 OF TM1650.C: 'lightLevel': unreferenced local variable
+*** WARNING C280 IN LINE 261 OF TM1650.C: 'SegmentMode': unreferenced local variable
+*** WARNING C280 IN LINE 261 OF TM1650.C: 'WorkMode': unreferenced local variable
+ 283          
+ 284          
+ 285          
+ 286          /***************************************END******************************************/
+ 287          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    279    ----
+   CONSTANT SIZE    =      4    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2       8
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       6
+C51 COMPILER V7.02a   TM1650                                                               07/31/2019 10:20:37 PAGE 6   
+
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  3 WARNING(S),  0 ERROR(S)

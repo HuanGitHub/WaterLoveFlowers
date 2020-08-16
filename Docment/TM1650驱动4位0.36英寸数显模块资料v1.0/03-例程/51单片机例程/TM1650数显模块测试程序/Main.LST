@@ -1,0 +1,139 @@
+C51 COMPILER V9.01   MAIN                                                                  03/14/2017 09:39:38 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN Main.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE Main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /*------------------------------------------------------------------------------------
+   2           * 项目名称:
+   3          
+   4               TM1650数显模块测试程序
+   5          
+   6           * 版权信息:
+   7          
+   8               (c) 飞翼电子, 2016.
+   9          
+  10           * 历史版本:
+  11                   
+  12               2016-5-11:
+  13                 - 初始版本 V1.0.0;
+  14          
+  15           * 配置说明:
+  16          
+  17               - 编译前，请根据硬件连接配置MCU与模块的通讯接口
+  18          -------------------------------------------------------------------------------------*/
+  19          /************************包含头文件***************************************************/
+  20          
+  21          #include<reg52.h>
+  22          #include<TM1650.h>
+  23          
+  24          /****************执行芯片初始化函数时是以此处所定义参数来设置芯片*********************/
+  25          #define ON      DISPLAY_ON
+  26          #define OFF     DISPLAY_OFF
+  27          unsigned char  LightLevel =     LV1;                               //显示亮度设置，设置取值范围见【芯片参数定义】                               
+  28          unsigned char  WorkMode  =      NORMAL_MODE;               //工作模式定义，取值范围见【芯片参数定义】
+  29          //显示段模式设置，有两种：8段显示模式和7段显示模式（取值范围见【芯片参数定义】）
+  30          #define SegmentMode             _8_SEGMENT_MODE 
+  31          
+  32          /*******************************全局变量**********************************************/
+  33          //八段数码管显示的每一段
+  34          unsigned char code Seg_test[8]=      {0x20,0x01,0x02,0x04,0x08,0x10,0x40,0x80}; 
+  35          //共阳极数码管数字0-9编码数组                           
+  36          unsigned char code Number_arr[10]=   {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};       
+  37          
+  38          /*************************************************************************************
+  39          *函数名：Delay(unsigned char time)
+  40          *功  能：延时函数
+  41          **************************************************************************************/
+  42          void Delay(unsigned char time)
+  43          {
+  44   1              int i,j,k;
+  45   1              for(i=0;i<time;i++)
+  46   1                      for(j=0;j<50;j++)
+  47   1                              for(k=0;k<90;k++)
+  48   1                              {
+  49   2                                      ;
+  50   2                              }
+  51   1      }
+  52          
+  53          /************************主程序*******************************************************/
+  54          void main()
+  55          {
+C51 COMPILER V9.01   MAIN                                                                  03/14/2017 09:39:38 PAGE 2   
+
+  56   1              unsigned char i,j=0,k=0,l=0,m=0;
+  57   1              unsigned char temp[4]={0x3f,0x06,0x5b,0x4f};
+  58   1              bit err = 0;
+  59   1              Delay(10);
+  60   1      
+  61   1              P0 = 0;
+  62   1              Delay(10);
+  63   1              P0 = 0xFF;
+  64   1              P1 = 0;
+  65   1      
+  66   1              while(1)
+  67   1              {
+  68   2                      //配置显示模块参数
+  69   2                      err = DisplayConfig_TM1650(LightLevel,SegmentMode,WorkMode,ON);
+  70   2                      //上电后让所有位所有段全亮
+  71   2                      for(i = 0;i < 4; i++)
+  72   2                      {
+  73   3                              err = DisplayOneDigi_TM1650(i+1,0xFF);
+  74   3                      }
+  75   2                      Delay(10);
+  76   2                      
+  77   2                      //让4位数码管的每个段分别点亮
+  78   2                      for(m=0;m<=9;m++)
+  79   2                      {
+  80   3                              for(i=0;i<4;i++)
+  81   3                              {
+  82   4                                       err = DisplayOneDigi_TM1650(i+1,Seg_test[m]);
+  83   4                              }
+  84   3                              Delay(10);
+  85   3                      }
+  86   2      
+  87   2                      //数码管显示测试,控制每个数码管显示从0-9
+  88   2                      for(m=0;m<=9;m++)
+  89   2                      {
+  90   3                              for(i=0;i<4;i++)
+  91   3                              {
+  92   4                                      err = DisplayOneDigi_TM1650(i+1,Number_arr[m]);
+  93   4                              }
+  94   3                              Delay(10);                      
+  95   3                      }
+  96   2                      //显示temp数组中的内容
+  97   2                      for(i=0;i<4;i++)
+  98   2                      {
+  99   3                              err = DisplayOneDigi_TM1650(i+1,temp[i]);
+ 100   3                      }
+ 101   2                      Delay(10);      
+ 102   2      
+ 103   2                      //关显示
+ 104   2                      err = DisplayOFF_TM1650(LightLevel,SegmentMode,WorkMode);                       
+ 105   2                      Delay(10);      
+ 106   2                      
+ 107   2                      //开显示
+ 108   2                      err = DisplayON_TM1650(LightLevel,SegmentMode,WorkMode);                        
+ 109   2                      Delay(10);      
+ 110   2                              
+ 111   2              }
+ 112   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    300    ----
+   CONSTANT SIZE    =     22    ----
+C51 COMPILER V9.01   MAIN                                                                  03/14/2017 09:39:38 PAGE 3   
+
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2       9
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

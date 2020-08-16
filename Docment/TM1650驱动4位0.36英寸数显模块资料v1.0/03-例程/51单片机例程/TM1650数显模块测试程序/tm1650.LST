@@ -1,0 +1,248 @@
+C51 COMPILER V9.01   TM1650                                                                03/14/2017 09:39:38 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE TM1650
+OBJECT MODULE PLACED IN tm1650.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE tm1650.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /*------------------------------------------------------------------------------------
+   2           * 项目名称:
+   3          
+   4               TM1650芯片驱动程序v1.0
+   5          
+   6           * 版权信息:
+   7          
+   8               (c) 飞翼电子, 2016.
+   9          
+  10           * 历史版本:
+  11               2016-12-07:
+  12                 - 初始版本 V1.0.0;
+  13          
+  14           * 备注:
+  15               - 使用前需要在TM1668.h文件设置通信接口、初始化数据
+  16          -------------------------------------------------------------------------------------*/
+  17          
+  18          /************************包含头文件***************************************************/
+  19          
+  20          #include <reg52.h>
+  21          #include "TM1650.h"
+  22          
+  23          code unsigned char DisplayAddressArray[4] = {DIG1_ADDRESS,DIG2_ADDRESS,DIG3_ADDRESS,DIG4_ADDRESS};
+  24          
+  25          /*************************************************************************************
+  26          *函数名：void FrameStart_1650(void)
+  27          *功  能：帧起始信号
+  28          *说  明：保持SCK为高，DIO从1跳到0为起始信号
+  29          **************************************************************************************/
+  30          void FrameStart_1650(void)
+  31          {
+  32   1              //先全部拉高
+  33   1              DIO=1;
+  34   1              SCK=1;            
+  35   1              //DIO拉低,然后将SCK也拉低，为后续传输准备
+  36   1              DIO=0;
+  37   1      }
+  38          
+  39          /*************************************************************************************
+  40          *函数名：void FrameStop_1650(void)
+  41          *功  能：帧结束信号
+  42          *说  明：保持SCK为高，DIO从0跳到1为结束信号
+  43          **************************************************************************************/
+  44          void FrameEnd_1650(void)
+  45          {
+  46   1              //先全部拉高
+  47   1              DIO=0;
+  48   1              SCK=1;            
+  49   1              //DIO拉低,然后将SCK也拉低，为后续传输准备
+  50   1              DIO=1;
+  51   1      }
+  52          /*************************************************************************************
+  53          *函数名：bit FrameAck_1650(void)
+  54          *功  能：帧Ack信号
+  55          *说  明：返回值为0表示通信正常，返回值为1表示通信异常
+C51 COMPILER V9.01   TM1650                                                                03/14/2017 09:39:38 PAGE 2   
+
+  56          **************************************************************************************/
+  57          bit FrameAck_1650(void)
+  58          {
+  59   1              //先判断DIO
+  60   1              if(DIO==0)
+  61   1              {
+  62   2                      SCK=1;
+  63   2                      SCK=0;
+  64   2                      return 0;
+  65   2              }
+  66   1              else
+  67   1              {
+  68   2                      return 1;
+  69   2              }
+  70   1      }
+  71          /*************************************************************************************
+  72          *函数名：void SendOneByte_TM1668(unsigned char byt)
+  73          *功  能：1668发送一个字节的数据
+  74          *说  明：低位先发送
+  75          **************************************************************************************/
+  76          bit SendOneCouple_TM1650(unsigned char firstByte,unsigned char secondByte)
+  77          {
+  78   1              unsigned char tmp;
+  79   1              unsigned char i=0;
+  80   1              bit err=0;                      //出错时返回1
+  81   1      
+  82   1              tmp=firstByte;
+  83   1              //起始信号
+  84   1              FrameStart_1650();
+  85   1              //发送数据，先发firstByte，再发secondByte，MSB在前
+  86   1              for(i=0;i<8;i++)
+  87   1              {
+  88   2                      if(tmp&0x80)
+  89   2                      {
+  90   3                              DIO=1;
+  91   3                      }
+  92   2                      else
+  93   2                      {
+  94   3                              DIO=0;
+  95   3                      }
+  96   2              
+  97   2                      SCK=0;
+  98   2                      SCK=1;
+  99   2                      SCK=0;
+ 100   2                      
+ 101   2                      tmp=tmp<<1;
+ 102   2              }
+ 103   1              //判断ACK
+ 104   1              if(FrameAck_1650()==1)
+ 105   1              {
+ 106   2                      err=1;
+ 107   2              }
+ 108   1              //发送secondByte
+ 109   1              tmp=secondByte;
+ 110   1              for(i=0;i<8;i++)
+ 111   1              {
+ 112   2                      if(tmp&0x80)
+ 113   2                      {
+ 114   3                              DIO=1;
+ 115   3                      }
+ 116   2                      else
+ 117   2                      {
+C51 COMPILER V9.01   TM1650                                                                03/14/2017 09:39:38 PAGE 3   
+
+ 118   3                              DIO=0;
+ 119   3                      }
+ 120   2              
+ 121   2                      SCK=0;
+ 122   2                      SCK=1;
+ 123   2                      SCK=0;
+ 124   2                      
+ 125   2                      tmp=tmp<<1;
+ 126   2              }
+ 127   1              //判断ACK
+ 128   1              if(FrameAck_1650()==1)
+ 129   1              {
+ 130   2                      err=1;
+ 131   2              }
+ 132   1              //结束信号
+ 133   1              FrameEnd_1650();
+ 134   1              //返回值
+ 135   1              return err;
+ 136   1      }
+ 137          /*************************************************************************************
+ 138          *函数名：bit DisplayConfig_TM1650(unsigned char lightLevel,unsigned char SegmentMode,unsigned char WorkMod
+             -e)
+ 139          *功  能：1668发送一个命令
+ 140          *说  明：低位先发送
+ 141          **************************************************************************************/
+ 142          bit DisplayConfig_TM1650(unsigned char lightLevel,unsigned char SegmentMode,unsigned char WorkMode,unsigne
+             -d char on_or_off)
+ 143          {
+ 144   1              unsigned char tmp = 0;
+ 145   1              bit err = 0;
+ 146   1              tmp = lightLevel | SegmentMode |  WorkMode | on_or_off;
+ 147   1              err = SendOneCouple_TM1650(CMD_SYSTEM_CONFIG,tmp);
+ 148   1      
+ 149   1              if(err == 1)
+ 150   1              {
+ 151   2                      return 1;
+ 152   2              }
+ 153   1              else
+ 154   1              {
+ 155   2                      return 0;
+ 156   2              }
+ 157   1      
+ 158   1      }
+ 159          /*************************************************************************************
+ 160          *函数名：void DisplayOneDigi_TM1668(unsigned char addr,unsigned char cha)
+ 161          *功  能：固定地址模式在指定位显示一个数据
+ 162          *说  明：
+ 163          *参  数：digi-显示的位，从1-4（从左到右），cha-待显示数据
+ 164          **************************************************************************************/
+ 165          bit DisplayOneDigi_TM1650(unsigned char digi,unsigned char cha)
+ 166          {
+ 167   1              unsigned char tmp = 0;
+ 168   1              bit err = 0;
+ 169   1              err = SendOneCouple_TM1650(DisplayAddressArray[digi-1],cha);
+ 170   1              return err;
+ 171   1      }
+ 172          
+ 173          /*************************************************************************************
+ 174          *函数名：void DisplayOneDigi_TM1668(unsigned char addr,unsigned char cha)
+ 175          *功  能：固定地址模式在指定位显示一个数据
+ 176          *说  明：
+ 177          *参  数：digi-显示的位，从1-4（从左到右），cha-待显示数据
+C51 COMPILER V9.01   TM1650                                                                03/14/2017 09:39:38 PAGE 4   
+
+ 178          **************************************************************************************/
+ 179          bit DisplayOFF_TM1650(unsigned char lightLevel,unsigned char SegmentMode,unsigned char WorkMode)
+ 180          {
+ 181   1              unsigned char tmp = 0;
+ 182   1              bit err = 0;
+ 183   1              tmp = lightLevel | SegmentMode |  WorkMode | DISPLAY_OFF;
+ 184   1              err = SendOneCouple_TM1650(CMD_SYSTEM_CONFIG,tmp);
+ 185   1      
+ 186   1              if(err == 1)
+ 187   1              {
+ 188   2                      return 1;
+ 189   2              }
+ 190   1              else
+ 191   1              {
+ 192   2                      return 0;
+ 193   2              }
+ 194   1      }
+ 195          /*************************************************************************************
+ 196          *函数名：void DisplayOneDigi_TM1668(unsigned char addr,unsigned char cha)
+ 197          *功  能：固定地址模式在指定位显示一个数据
+ 198          *说  明：
+ 199          *参  数：digi-显示的位，从1-4（从左到右），cha-待显示数据
+ 200          **************************************************************************************/
+ 201          bit DisplayON_TM1650(unsigned char lightLevel,unsigned char SegmentMode,unsigned char WorkMode)
+ 202          {
+ 203   1              unsigned char tmp = 0;
+ 204   1              bit err = 0;
+ 205   1              tmp = lightLevel | SegmentMode |  WorkMode | DISPLAY_ON;
+ 206   1              err = SendOneCouple_TM1650(CMD_SYSTEM_CONFIG,tmp);
+ 207   1      
+ 208   1              if(err == 1)
+ 209   1              {
+ 210   2                      return 1;
+ 211   2              }
+ 212   1              else
+ 213   1              {
+ 214   2                      return 0;
+ 215   2              }
+ 216   1      }
+ 217          /***************************************END******************************************/
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    190    ----
+   CONSTANT SIZE    =      4    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       5
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       5
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

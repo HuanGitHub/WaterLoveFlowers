@@ -1,0 +1,481 @@
+BL51 BANKED LINKER/LOCATER V5.02                                                        07/31/2019  10:25:36  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V5.02, INVOKED BY:
+C:\KEIL\C51\BIN\BL51.EXE TM1650.obj, MAIN.obj TO TM1650 RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  TM1650.obj (TM1650)
+  MAIN.obj (MAIN)
+  C:\KEIL\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL\C51\LIB\C51S.LIB (?C?COPY)
+  C:\KEIL\C51\LIB\C51S.LIB (?C_INIT)
+
+
+LINK MAP OF MODULE:  TM1650 (TM1650)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0012H     UNIT         _DATA_GROUP_
+            DATA    001AH     0002H     UNIT         ?DT?TM1650
+            DATA    001CH     0002H     UNIT         ?DT?MAIN
+                    001EH     0002H                  *** GAP ***
+            BIT     0020H.0   0000H.3   UNIT         _BIT_GROUP_
+            BIT     0020H.3   0000H.1   UNIT         ?BI?_DISPLAYOFF_TM1650?TM1650
+            BIT     0020H.4   0000H.1   UNIT         ?BI?_DISPLAYON_TM1650?TM1650
+                    0020H.5   0000H.3                *** GAP ***
+            IDATA   0021H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     00F6H     UNIT         ?C?LIB_CODE
+            CODE    00F9H     00CEH     UNIT         ?PR?MAIN?MAIN
+            CODE    01C7H     008CH     UNIT         ?C_C51STARTUP
+            CODE    0253H     0052H     UNIT         ?PR?_SENDONECOUPLE_TM1650?TM1650
+            CODE    02A5H     0035H     UNIT         ?PR?_DELAY?MAIN
+            CODE    02DAH     0030H     UNIT         ?PR?_SCAN_KEY_TM1650?TM1650
+            CODE    030AH     0029H     UNIT         ?PR?_SENDONE_TM1650?TM1650
+            CODE    0333H     0018H     UNIT         ?PR?_DISPLAYON_TM1650?TM1650
+            CODE    034BH     0016H     UNIT         ?CO?MAIN
+            CODE    0361H     0015H     UNIT         ?PR?_DISPLAYCONFIG_TM1650?TM1650
+            CODE    0376H     0013H     UNIT         ?PR?_DISPLAYONEDIGI_TM1650?TM1650
+            CODE    0389H     0013H     UNIT         ?PR?_DISPLAYOFF_TM1650?TM1650
+            CODE    039CH     000BH     UNIT         ?PR?FRAMEACK_1650?TM1650
+            CODE    03A7H     0007H     UNIT         ?PR?FRAMESTART_1650?TM1650
+            CODE    03AEH     0007H     UNIT         ?PR?FRAMEEND_1650?TM1650
+            CODE    03B5H     0007H     UNIT         ?C_INITSEG
+            CODE    03BCH     0004H     UNIT         ?CO?TM1650
+
+
+
+OVERLAY MAP OF MODULE:   TM1650 (TM1650)
+
+
+BL51 BANKED LINKER/LOCATER V5.02                                                      07/31/2019  10:25:36  PAGE 2
+
+
+SEGMENT                                      BIT_GROUP          DATA_GROUP 
+  +--> CALLED SEGMENT                     START    LENGTH     START    LENGTH
+-----------------------------------------------------------------------------
+?C_C51STARTUP                             -----    -----      -----    -----
+  +--> ?PR?MAIN?MAIN
+  +--> ?C_INITSEG
+
+?PR?MAIN?MAIN                             0020H.0  0000H.1    0008H    000EH
+  +--> ?CO?MAIN
+  +--> ?PR?_DELAY?MAIN
+  +--> ?PR?_DISPLAYCONFIG_TM1650?TM1650
+  +--> ?PR?_DISPLAYONEDIGI_TM1650?TM1650
+  +--> ?PR?_SCAN_KEY_TM1650?TM1650
+
+?PR?_DISPLAYCONFIG_TM1650?TM1650          0020H.1  0000H.1    0016H    0004H
+  +--> ?PR?_SENDONECOUPLE_TM1650?TM1650
+
+?PR?_SENDONECOUPLE_TM1650?TM1650          0020H.2  0000H.1    -----    -----
+  +--> ?PR?FRAMESTART_1650?TM1650
+  +--> ?PR?FRAMEACK_1650?TM1650
+  +--> ?PR?FRAMEEND_1650?TM1650
+
+?PR?_DISPLAYONEDIGI_TM1650?TM1650         0020H.1  0000H.1    0016H    0001H
+  +--> ?CO?TM1650
+  +--> ?PR?_SENDONECOUPLE_TM1650?TM1650
+
+?PR?_SCAN_KEY_TM1650?TM1650               -----    -----      0016H    0003H
+  +--> ?PR?FRAMESTART_1650?TM1650
+  +--> ?PR?_SENDONE_TM1650?TM1650
+  +--> ?PR?FRAMEACK_1650?TM1650
+  +--> ?PR?FRAMEEND_1650?TM1650
+
+?PR?_SENDONE_TM1650?TM1650                0020H.1  0000H.1    -----    -----
+  +--> ?PR?FRAMESTART_1650?TM1650
+  +--> ?PR?FRAMEACK_1650?TM1650
+
+
+
+SYMBOL TABLE OF MODULE:  TM1650 (TM1650)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        TM1650
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0090H         PUBLIC        P1
+  D:00B0H         PUBLIC        P3
+  D:00A8H         PUBLIC        IE
+  D:00B8H         PUBLIC        IP
+  C:0333H         PUBLIC        _DisplayON_TM1650
+  C:03BCH         PUBLIC        DisplayAddressArray
+  C:039CH         PUBLIC        FrameAck_1650
+  C:03A7H         PUBLIC        FrameStart_1650
+  C:0376H         PUBLIC        _DisplayOneDigi_TM1650
+  C:03AEH         PUBLIC        FrameEnd_1650
+  D:0098H         PUBLIC        SCON
+  D:0088H         PUBLIC        TCON
+BL51 BANKED LINKER/LOCATER V5.02                                                      07/31/2019  10:25:36  PAGE 3
+
+
+  C:02DAH         PUBLIC        _Scan_Key_TM1650
+  D:001AH         PUBLIC        err
+  C:0256H         PUBLIC        _SendOneCouple_TM1650
+  D:001BH         PUBLIC        tmp
+  B:0090H.1       PUBLIC        DIO
+  C:030AH         PUBLIC        _SendOne_TM1650
+  B:0090H.0       PUBLIC        SCK
+  C:0361H         PUBLIC        _DisplayConfig_TM1650
+  C:0389H         PUBLIC        _DisplayOFF_TM1650
+  D:00C8H         PUBLIC        T2CON
+  D:00D0H         PUBLIC        PSW
+  -------         PROC          FRAMESTART_1650
+  C:03A7H         LINE#         27
+  C:03A7H         LINE#         28
+  C:03A7H         LINE#         30
+  C:03A9H         LINE#         31
+  C:03ABH         LINE#         33
+  C:03ADH         LINE#         34
+  -------         ENDPROC       FRAMESTART_1650
+  -------         PROC          FRAMEEND_1650
+  C:03AEH         LINE#         41
+  C:03AEH         LINE#         42
+  C:03AEH         LINE#         44
+  C:03B0H         LINE#         45
+  C:03B2H         LINE#         47
+  C:03B4H         LINE#         48
+  -------         ENDPROC       FRAMEEND_1650
+  -------         PROC          FRAMEACK_1650
+  C:039CH         LINE#         54
+  C:039CH         LINE#         55
+  C:039CH         LINE#         57
+  C:039FH         LINE#         58
+  C:039FH         LINE#         59
+  C:03A1H         LINE#         60
+  C:03A3H         LINE#         61
+  C:03A5H         LINE#         62
+  C:03A5H         LINE#         64
+  C:03A5H         LINE#         65
+  C:03A6H         LINE#         66
+  C:03A6H         LINE#         67
+  -------         ENDPROC       FRAMEACK_1650
+  -------         PROC          _SENDONE_TM1650
+  D:0007H         SYMBOL        firstByte
+  -------         DO            
+  D:0007H         SYMBOL        tmp
+  D:0006H         SYMBOL        i
+  B:0020H.1       SYMBOL        err
+  -------         ENDDO         
+  C:030AH         LINE#         73
+  C:030AH         LINE#         74
+  C:030AH         LINE#         76
+  C:030CH         LINE#         77
+  C:030EH         LINE#         79
+  C:030EH         LINE#         81
+  C:0311H         LINE#         83
+  C:0311H         LINE#         84
+  C:0311H         LINE#         85
+BL51 BANKED LINKER/LOCATER V5.02                                                      07/31/2019  10:25:36  PAGE 4
+
+
+  C:0315H         LINE#         86
+  C:0315H         LINE#         87
+  C:0317H         LINE#         88
+  C:0319H         LINE#         90
+  C:0319H         LINE#         91
+  C:031BH         LINE#         92
+  C:031BH         LINE#         94
+  C:031DH         LINE#         95
+  C:031FH         LINE#         96
+  C:0321H         LINE#         98
+  C:0325H         LINE#         99
+  C:0329H         LINE#         101
+  C:032EH         LINE#         102
+  C:032EH         LINE#         103
+  C:0330H         LINE#         104
+  C:0330H         LINE#         106
+  C:0332H         LINE#         107
+  -------         ENDPROC       _SENDONE_TM1650
+  -------         PROC          L?0041
+  -------         ENDPROC       L?0041
+  -------         PROC          _SENDONECOUPLE_TM1650
+  D:0007H         SYMBOL        firstByte
+  D:0005H         SYMBOL        secondByte
+  -------         DO            
+  D:0007H         SYMBOL        tmp
+  D:0006H         SYMBOL        i
+  B:0020H.2       SYMBOL        err
+  -------         ENDDO         
+  C:0256H         LINE#         113
+  C:0256H         LINE#         114
+  C:0256H         LINE#         116
+  C:0258H         LINE#         117
+  C:025AH         LINE#         119
+  C:025AH         LINE#         121
+  C:025DH         LINE#         123
+  C:025DH         LINE#         124
+  C:025DH         LINE#         125
+  C:0261H         LINE#         126
+  C:0261H         LINE#         127
+  C:0263H         LINE#         128
+  C:0265H         LINE#         130
+  C:0265H         LINE#         131
+  C:0267H         LINE#         132
+  C:0267H         LINE#         134
+  C:0269H         LINE#         135
+  C:026BH         LINE#         136
+  C:026DH         LINE#         138
+  C:0271H         LINE#         139
+  C:0275H         LINE#         141
+  C:027AH         LINE#         142
+  C:027AH         LINE#         143
+  C:027CH         LINE#         144
+  C:027CH         LINE#         146
+  C:027EH         LINE#         147
+  C:0280H         LINE#         148
+  C:0280H         LINE#         149
+  C:0284H         LINE#         150
+BL51 BANKED LINKER/LOCATER V5.02                                                      07/31/2019  10:25:36  PAGE 5
+
+
+  C:0284H         LINE#         151
+  C:0286H         LINE#         152
+  C:0288H         LINE#         154
+  C:0288H         LINE#         155
+  C:028AH         LINE#         156
+  C:028AH         LINE#         158
+  C:028CH         LINE#         159
+  C:028EH         LINE#         160
+  C:0290H         LINE#         162
+  C:0294H         LINE#         163
+  C:0298H         LINE#         165
+  C:029DH         LINE#         166
+  C:029DH         LINE#         167
+  C:029FH         LINE#         168
+  C:029FH         LINE#         170
+  C:02A2H         LINE#         172
+  C:02A4H         LINE#         173
+  -------         ENDPROC       _SENDONECOUPLE_TM1650
+  -------         PROC          _DISPLAYCONFIG_TM1650
+  D:0007H         SYMBOL        lightLevel
+  D:0006H         SYMBOL        SegmentMode
+  D:0003H         SYMBOL        WorkMode
+  D:0019H         SYMBOL        on_or_off
+  -------         DO            
+  D:0005H         SYMBOL        tmp
+  B:0020H.1       SYMBOL        err
+  -------         ENDDO         
+  C:0361H         LINE#         179
+  C:0363H         LINE#         180
+  C:0363H         LINE#         181
+  C:0363H         LINE#         182
+  C:0365H         LINE#         183
+  C:036AH         LINE#         184
+  C:036FH         LINE#         186
+  C:0372H         LINE#         187
+  C:0372H         LINE#         188
+  C:0374H         LINE#         189
+  C:0374H         LINE#         191
+  C:0374H         LINE#         192
+  C:0375H         LINE#         193
+  C:0375H         LINE#         195
+  -------         ENDPROC       _DISPLAYCONFIG_TM1650
+  -------         PROC          _DISPLAYONEDIGI_TM1650
+  D:0007H         SYMBOL        digi
+  D:0005H         SYMBOL        cha
+  -------         DO            
+  D:0016H         SYMBOL        tmp
+  B:0020H.1       SYMBOL        err
+  -------         ENDDO         
+  C:0376H         LINE#         202
+  C:0376H         LINE#         203
+  C:0376H         LINE#         204
+  C:0379H         LINE#         205
+  C:037BH         LINE#         206
+  C:0386H         LINE#         207
+  C:0388H         LINE#         208
+  -------         ENDPROC       _DISPLAYONEDIGI_TM1650
+BL51 BANKED LINKER/LOCATER V5.02                                                      07/31/2019  10:25:36  PAGE 6
+
+
+  -------         PROC          _DISPLAYOFF_TM1650
+  D:0007H         SYMBOL        lightLevel
+  D:0006H         SYMBOL        SegmentMode
+  D:0003H         SYMBOL        WorkMode
+  -------         DO            
+  D:0005H         SYMBOL        tmp
+  B:0020H.3       SYMBOL        err
+  -------         ENDDO         
+  C:0389H         LINE#         216
+  C:038BH         LINE#         217
+  C:038BH         LINE#         218
+  C:038BH         LINE#         219
+  C:038DH         LINE#         220
+  C:0390H         LINE#         221
+  C:0395H         LINE#         223
+  C:0398H         LINE#         224
+  C:0398H         LINE#         225
+  C:039AH         LINE#         226
+  C:039AH         LINE#         228
+  C:039AH         LINE#         229
+  C:039BH         LINE#         230
+  C:039BH         LINE#         231
+  -------         ENDPROC       _DISPLAYOFF_TM1650
+  -------         PROC          _DISPLAYON_TM1650
+  D:0007H         SYMBOL        lightLevel
+  D:0006H         SYMBOL        SegmentMode
+  D:0003H         SYMBOL        WorkMode
+  -------         DO            
+  D:0005H         SYMBOL        tmp
+  B:0020H.4       SYMBOL        err
+  -------         ENDDO         
+  C:0333H         LINE#         238
+  C:0335H         LINE#         239
+  C:0335H         LINE#         240
+  C:0335H         LINE#         241
+  C:0337H         LINE#         242
+  C:033DH         LINE#         243
+  C:0344H         LINE#         245
+  C:0347H         LINE#         246
+  C:0347H         LINE#         247
+  C:0349H         LINE#         248
+  C:0349H         LINE#         250
+  C:0349H         LINE#         251
+  C:034AH         LINE#         252
+  C:034AH         LINE#         253
+  -------         ENDPROC       _DISPLAYON_TM1650
+  -------         PROC          _SCAN_KEY_TM1650
+  D:0016H         SYMBOL        lightLevel
+  D:0017H         SYMBOL        SegmentMode
+  D:0018H         SYMBOL        WorkMode
+  -------         DO            
+  D:0007H         SYMBOL        i
+  D:0004H         SYMBOL        rekey
+  -------         ENDDO         
+  C:02DAH         LINE#         261
+  C:02E0H         LINE#         262
+  C:02E0H         LINE#         265
+BL51 BANKED LINKER/LOCATER V5.02                                                      07/31/2019  10:25:36  PAGE 7
+
+
+  C:02E3H         LINE#         266
+  C:02ECH         LINE#         267
+  C:02EFH         LINE#         269
+  C:02F1H         LINE#         270
+  C:02F1H         LINE#         271
+  C:02F3H         LINE#         272
+  C:02F7H         LINE#         273
+  C:02FAH         LINE#         274
+  C:02FAH         LINE#         275
+  C:02FBH         LINE#         276
+  C:02FBH         LINE#         277
+  C:02FDH         LINE#         278
+  C:0301H         LINE#         279
+  C:0304H         LINE#         280
+  C:0307H         LINE#         281
+  C:0309H         LINE#         282
+  -------         ENDPROC       _SCAN_KEY_TM1650
+  -------         ENDMOD        TM1650
+
+  -------         MODULE        MAIN
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
+  D:00B0H         PUBLIC        P3
+  D:00A8H         PUBLIC        IE
+  C:0353H         PUBLIC        Number_arr
+  D:00B8H         PUBLIC        IP
+  C:00F9H         PUBLIC        main
+  D:001CH         PUBLIC        WorkMode
+  D:0098H         PUBLIC        SCON
+  D:0088H         PUBLIC        TCON
+  C:035DH         SYMBOL        _?ix1000
+  C:034BH         PUBLIC        Seg_test
+  C:02A5H         PUBLIC        _Delay
+  D:00C8H         PUBLIC        T2CON
+  D:001DH         PUBLIC        LightLevel
+  D:00D0H         PUBLIC        PSW
+  -------         PROC          _DELAY
+  D:0001H         SYMBOL        time
+  -------         DO            
+  D:0006H         SYMBOL        i
+  D:0004H         SYMBOL        j
+  D:0002H         SYMBOL        k
+  -------         ENDDO         
+  C:02A5H         LINE#         39
+  C:02A7H         LINE#         40
+  C:02A7H         LINE#         42
+  C:02B6H         LINE#         43
+  C:02B9H         LINE#         44
+  C:02BCH         LINE#         45
+  C:02BCH         LINE#         47
+  C:02D9H         LINE#         48
+  -------         ENDPROC       _DELAY
+  -------         PROC          MAIN
+  -------         DO            
+  D:0008H         SYMBOL        key_value
+  D:0009H         SYMBOL        show_buff
+BL51 BANKED LINKER/LOCATER V5.02                                                      07/31/2019  10:25:36  PAGE 8
+
+
+  D:000DH         SYMBOL        i
+  D:000EH         SYMBOL        j
+  D:000FH         SYMBOL        k
+  D:0010H         SYMBOL        l
+  D:0011H         SYMBOL        m
+  D:0012H         SYMBOL        temp
+  B:0020H.0       SYMBOL        err
+  -------         ENDDO         
+  C:00F9H         LINE#         51
+  C:00F9H         LINE#         52
+  C:00F9H         LINE#         53
+  C:00FCH         LINE#         55
+  C:0104H         LINE#         56
+  C:0115H         LINE#         57
+  C:0117H         LINE#         58
+  C:011CH         LINE#         60
+  C:011FH         LINE#         61
+  C:0124H         LINE#         62
+  C:0127H         LINE#         63
+  C:012AH         LINE#         65
+  C:0137H         LINE#         67
+  C:013AH         LINE#         68
+  C:013AH         LINE#         69
+  C:0145H         LINE#         70
+  C:014EH         LINE#         71
+  C:0153H         LINE#         72
+  C:0156H         LINE#         73
+  C:0156H         LINE#         74
+  C:0161H         LINE#         75
+  C:016AH         LINE#         76
+  C:016FH         LINE#         77
+  C:016FH         LINE#         78
+  C:016FH         LINE#         79
+  C:017AH         LINE#         90
+  C:0184H         LINE#         91
+  C:018EH         LINE#         92
+  C:0198H         LINE#         93
+  C:01A2H         LINE#         94
+  C:01A5H         LINE#         97
+  C:01AFH         LINE#         98
+  C:01AFH         LINE#         99
+  C:01C3H         LINE#         100
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        MAIN
+
+  -------         MODULE        ?C?COPY
+  C:00D3H         PUBLIC        ?C?COPY
+  -------         ENDMOD        ?C?COPY
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_DISPLAYOFF_TM1650?TM1650
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_DISPLAYON_TM1650?TM1650
+
+Program Size: data=31.5 xdata=0 code=960
+LINK/LOCATE RUN COMPLETE.  2 WARNING(S),  0 ERROR(S)
